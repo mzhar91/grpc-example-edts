@@ -1,0 +1,37 @@
+# Mac OS X
+.DS_Store
+.DS_Store?
+__MACOSX
+ehthumbs.db
+Thumbs.db
+.AppleDouble
+.LSOverride
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+*.iml
+*~.nib
+*.swp
+*~
+*(Autosaved).rtfd/
+Backup[ ]of[ ]*.pages/
+Backup[ ]of[ ]*.key/
+Backup[ ]of[ ]*.numbers/
+dump.rdb
+
+# IDE
+.idea
+.vscode
+
+## Build products
+*/dist
+*/node_modules
+.env
+env.json
+*/vendor/
+
+
