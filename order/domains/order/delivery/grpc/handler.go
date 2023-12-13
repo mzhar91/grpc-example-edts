@@ -16,18 +16,20 @@ import (
 
 type routeGuideAccount struct {
 	OrderUseCase _order.Usecase
-	_orderPB.UnimplementedAccountServiceServer
+	_orderPB.UnimplementedOrderServiceServer
 	mu sync.Mutex
 }
 
 // NewHandler represent new handler
-func NewGuide(pu _order.Usecase) _orderPB.AccountServiceServer {
+func NewGuide(pu _order.Usecase) _orderPB.OrderServiceServer {
 	return &routeGuideAccount{
 		OrderUseCase: pu,
 	}
 }
 
-func (r *routeGuideAccount) EditOrder(ctx context.Context, req *_orderPB.EditOrderRequest) (*_orderPB.EditOrderResponse, error) {
+func (r *routeGuideAccount) EditOrderStatus(ctx context.Context, req *_orderPB.EditOrderStatusRequest) (*_orderPB.EditOrderStatusResponse, error) {
+	var orderStatus string
+	
 	if req == nil {
 		return nil, status.Errorf(
 			codes.Canceled,
@@ -35,22 +37,28 @@ func (r *routeGuideAccount) EditOrder(ctx context.Context, req *_orderPB.EditOrd
 		)
 	}
 	
-	log.Printf("EditOrder function was invoked with %v\n", req)
+	log.Printf("EditStatusOrder function was invoked with %v\n", req)
 	
-	_, err := r.OrderUseCase.EditOrder(
-		ctx, req.Id, _models.OrderPatch{
-			Status: req.Status,
+	if req.Status {
+		orderStatus = "active"
+	} else {
+		orderStatus = "cancel"
+	}
+	
+	_, err := r.OrderUseCase.EditStatusOrder(
+		ctx, req.Id, _models.OrderStatusPatch{
+			Status: orderStatus,
 		},
 	)
 	if err != nil {
 		return nil, status.Errorf(
 			codes.Canceled,
-			"failed to edit order caused %v",
+			"failed to edit status order caused %v",
 			err.(*_apiError.APIError).Message,
 		)
 	}
 	
-	res := &_orderPB.EditOrderResponse{
+	res := &_orderPB.EditOrderStatusResponse{
 		Id: req.Id,
 	}
 	

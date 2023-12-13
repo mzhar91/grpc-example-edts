@@ -8,24 +8,24 @@ import (
 	"google.golang.org/grpc"
 	
 	_config "github.com/grpc-example-edts/payment/config"
-	_paymentApiPB "github.com/grpc-example-edts/payment/pb/client/payment-api"
+	_orderApiPB "github.com/grpc-example-edts/payment/pb/client/order-api"
 )
 
 type dialPaymentApi struct {
-	Payment _paymentApiPB.PaymentServiceClient
+	Order _orderApiPB.OrderServiceClient
 }
 
 var initPaymentApi *dialPaymentApi = nil
 
-func DialCustomerAPI(context context.Context, authorization string) (*dialPaymentApi, *grpc.ClientConn) {
-	conn, err := grpc.Dial(_config.Env.PaymentApiHostGRPC, grpc.WithInsecure())
+func DialOrderAPI(context context.Context) (*dialPaymentApi, context.Context, *grpc.ClientConn) {
+	conn, err := grpc.Dial(_config.Env.OrderApiHostGRPC, grpc.WithInsecure())
 	if err != nil {
 		log.Println(fmt.Printf("did not connect: %s", err))
 	}
 	
 	initPaymentApi = &dialPaymentApi{
-		Payment: _paymentApiPB.NewPaymentServiceClient(conn),
+		Order: _orderApiPB.NewOrderServiceClient(conn),
 	}
 	
-	return initPaymentApi, conn
+	return initPaymentApi, context, conn
 }

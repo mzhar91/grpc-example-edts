@@ -107,7 +107,7 @@ func (a *ucase) AddOrder(ctx context.Context, param _models.OrderPost) (string, 
 	return result, nil
 }
 
-func (a *ucase) EditOrder(ctx context.Context, id string, param _models.OrderPatch) (string, error) {
+func (a *ucase) EditStatusOrder(ctx context.Context, id string, param _models.OrderStatusPatch) (string, error) {
 	var result string
 	
 	err, code := _repository.WithTransaction(

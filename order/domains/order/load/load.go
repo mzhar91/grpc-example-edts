@@ -33,5 +33,5 @@ func GrpcLoad(s *grpc.Server, connection *_config.Connection, timeoutContext tim
 	ucase := _usecase.NewUcase(repo, connection, timeoutContext)
 	guide := _grpc.NewGuide(ucase)
 	
-	_orderPB.RegisterAccountServiceServer(s, guide)
+	_orderPB.RegisterOrderServiceServer(s, guide)
 }

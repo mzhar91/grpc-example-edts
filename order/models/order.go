@@ -35,6 +35,6 @@ type OrderPost struct {
 	Price float64 `json:"price" validate:"required"`
 }
 
-type OrderPatch struct {
+type OrderStatusPatch struct {
 	Status string `json:"status"`
 }

@@ -98,7 +98,7 @@ func (m *mysqlRepository) ReadByID(ctx context.Context, conn *_repository.Use, i
 	sb.Select(
 		"p.id",
 		"p.order_id",
-		"p.username",
+		"p.price",
 		"p.status",
 		"p.created_by",
 		"p.created_at",

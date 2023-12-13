@@ -105,7 +105,7 @@ func (m *mysqlRepository) ReadByID(ctx context.Context, conn *_repository.Use, i
 		"o.modified_by",
 		"o.modified_at",
 	)
-	sb.From("order AS o")
+	sb.From("`order` AS o")
 	sb.Where(
 		sb.Equal("o.id", id),
 	)
@@ -132,7 +132,7 @@ func (m *mysqlRepository) ReadByUsername(ctx context.Context, conn *_repository.
 		"o.modified_by",
 		"o.modified_at",
 	)
-	sb.From("order AS o")
+	sb.From("`order` AS o")
 	sb.Where(
 		sb.Equal("o.username", username),
 	)

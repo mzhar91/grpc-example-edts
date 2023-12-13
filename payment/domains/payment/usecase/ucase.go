@@ -8,11 +8,14 @@ import (
 	"net/http"
 	"time"
 	
+	_orderApiPB "github.com/grpc-example-edts/payment/pb/client/order-api"
 	uuid "github.com/satori/go.uuid"
+	"google.golang.org/grpc"
 	
 	_config "github.com/grpc-example-edts/payment/config"
 	_payment "github.com/grpc-example-edts/payment/domains/payment"
 	_apiError "github.com/grpc-example-edts/payment/helpers/apierror"
+	_grpcHelper "github.com/grpc-example-edts/payment/helpers/grpc"
 	_repository "github.com/grpc-example-edts/payment/helpers/repository"
 	_mysql "github.com/grpc-example-edts/payment/helpers/repository/mysql"
 	_models "github.com/grpc-example-edts/payment/models"
@@ -87,6 +90,7 @@ func (a *ucase) ConfirmPayment(ctx context.Context, id string, param _models.Pay
 	err, code := _repository.WithTransaction(
 		a.dbConn, func(tx _repository.Transaction) (error, int) {
 			var status string
+			var orderStatus bool
 			
 			conn := &_repository.Use{
 				Trans: tx,
@@ -94,7 +98,7 @@ func (a *ucase) ConfirmPayment(ctx context.Context, id string, param _models.Pay
 			now := time.Now()
 			
 			// check if account exist
-			_, err := a.paymentRepo.ReadByID(ctx, conn, uuid.FromStringOrNil(id))
+			getPayment, err := a.paymentRepo.ReadByID(ctx, conn, uuid.FromStringOrNil(id))
 			if err != nil {
 				log.Printf(err.Error())
 				
@@ -103,8 +107,10 @@ func (a *ucase) ConfirmPayment(ctx context.Context, id string, param _models.Pay
 			
 			if param.Status {
 				status = "paid"
+				orderStatus = true
 			} else {
 				status = "cancel"
+				orderStatus = false
 			}
 			
 			err = a.paymentRepo.UpdateStatus(
@@ -120,7 +126,28 @@ func (a *ucase) ConfirmPayment(ctx context.Context, id string, param _models.Pay
 				return err, http.StatusInternalServerError
 			}
 			
-			result = id
+			// calling grpc function for update order status
+			grpcOrder, ctxPayment, grpcConn := _grpcHelper.DialOrderAPI(ctx)
+			defer func(grpcConn *grpc.ClientConn) {
+				err := grpcConn.Close()
+				if err != nil {
+					log.Printf(err.Error())
+				}
+			}(grpcConn)
+			
+			updateOrder, err := grpcOrder.Order.EditOrderStatus(
+				ctxPayment, &_orderApiPB.EditOrderStatusRequest{
+					Id:     getPayment.OrderID.String(),
+					Status: orderStatus,
+				},
+			)
+			if err != nil {
+				log.Printf(err.Error())
+				
+				return err, http.StatusInternalServerError
+			}
+			
+			result = id + " | " + updateOrder.Id
 			
 			return nil, http.StatusOK
 		},

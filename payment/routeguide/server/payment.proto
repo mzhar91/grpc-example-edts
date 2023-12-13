@@ -1,7 +1,7 @@
 syntax = "proto3";
 package payment;
 
-option go_package = "github.com/grpc-example-edts/payment/routeguide/client/payment-api/paymentpb";
+option go_package = "github.com/grpc-example-edts/payment/routeguide/paymentpb";
 
 message AddPaymentRequest {
   string orderId = 1;

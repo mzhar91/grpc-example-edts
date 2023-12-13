@@ -10,5 +10,5 @@ type Usecase interface {
 	GetOrderByID(ctx context.Context, id string) (res *_models.Order, err error)
 	GetOrderByUsername(ctx context.Context, username string) (res []*_models.Order, err error)
 	AddOrder(ctx context.Context, param _models.OrderPost) (string, error)
-	EditOrder(ctx context.Context, id string, param _models.OrderPatch) (string, error)
+	EditStatusOrder(ctx context.Context, id string, param _models.OrderStatusPatch) (string, error)
 }

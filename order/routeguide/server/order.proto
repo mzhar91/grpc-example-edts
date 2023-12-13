@@ -1,17 +1,17 @@
 syntax = "proto3";
-
 package order;
-option go_package = "github.com/grpc-example-edts/order/routeguide/server/order/orderpb";
 
-message EditOrderRequest {
+option go_package = "github.com/grpc-example-edts/order/routeguide/orderpb";
+
+message EditOrderStatusRequest {
   string id = 1;
-  string status = 2;
+  bool status = 2;
 }
 
-message EditOrderResponse {
+message EditOrderStatusResponse {
   string id = 1;
 }
 
-service AccountService {
-  rpc EditOrderStatus (EditOrderRequest) returns (EditOrderResponse) {};
+service OrderService {
+  rpc EditOrderStatus (EditOrderStatusRequest) returns (EditOrderStatusResponse) {};
 }
