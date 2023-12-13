@@ -17,7 +17,7 @@ type dialPaymentApi struct {
 
 var initPaymentApi *dialPaymentApi = nil
 
-func DialCustomerAPI(context context.Context, authorization string) (*dialPaymentApi, *grpc.ClientConn) {
+func DialPaymentAPI(context context.Context) (*dialPaymentApi, context.Context, *grpc.ClientConn) {
 	conn, err := grpc.Dial(_config.Env.PaymentApiHostGRPC, grpc.WithInsecure())
 	if err != nil {
 		log.Println(fmt.Printf("did not connect: %s", err))
@@ -27,5 +27,5 @@ func DialCustomerAPI(context context.Context, authorization string) (*dialPaymen
 		Payment: _paymentApiPB.NewPaymentServiceClient(conn),
 	}
 	
-	return initPaymentApi, conn
+	return initPaymentApi, context, conn
 }

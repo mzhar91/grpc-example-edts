@@ -24,9 +24,9 @@ func NewHandler(e *echo.Echo, us _payment.Usecase) {
 		PaymentUseCase: us,
 	}
 	
-	gu := e.Group("/user/account")
-	gu.GET("/healthcheck", handler.healthcheck)
-	gu.PATCH("/confirm/:id", handler.confirmPayment)
+	gu := e.Group("/")
+	gu.GET("healthcheck", handler.healthcheck)
+	gu.PATCH("confirm/:id", handler.confirmPayment)
 }
 
 // Healthcheck to check if the service is running

@@ -19,7 +19,7 @@ func NewMysqlRepository() _payment.MysqlRepository {
 	return &mysqlRepository{}
 }
 
-func (m *mysqlRepository) Create(ctx context.Context, tx *_repository.Use, param *_models.Payment) error {
+func (m *mysqlRepository) Create(ctx context.Context, tx *_repository.Use, param *_models.PaymentCreate) error {
 	cols, values, err := _repository.Values(reflect.ValueOf(param).Elem())
 	if err != nil {
 		return err
@@ -55,7 +55,7 @@ func (m *mysqlRepository) Create(ctx context.Context, tx *_repository.Use, param
 	return nil
 }
 
-func (m *mysqlRepository) Update(ctx context.Context, tx *_repository.Use, id uuid.UUID, param *_models.Payment) error {
+func (m *mysqlRepository) UpdateStatus(ctx context.Context, tx *_repository.Use, id uuid.UUID, param *_models.PaymentStatusUpdate) error {
 	set, err := _repository.Set(reflect.ValueOf(param).Elem())
 	if err != nil {
 		return err

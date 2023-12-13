@@ -11,15 +11,28 @@ type Order struct {
 	Username   string      `json:"username" db:"username"`
 	Status     string      `json:"status" db:"status"`
 	CreatedBy  string      `json:"createdBy" db:"created_by"`
-	CreatedAt  int         `json:"createdAt" db:"created_at"`
+	CreatedAt  int64       `json:"createdAt" db:"created_at"`
 	ModifiedBy null.String `json:"modifiedBy" db:"modified_by"`
 	ModifiedAt null.Int    `json:"modifiedAt" db:"modified_at"`
 }
 
+type OrderCreate struct {
+	ID        uuid.UUID `db:"id"`
+	Price     float64   `db:"price"`
+	Username  string    `db:"username"`
+	Status    string    `db:"status"`
+	CreatedBy string    `db:"created_by"`
+	CreatedAt int64     `db:"created_at"`
+}
+
+type OrderStatusUpdate struct {
+	Status     string `db:"status"`
+	ModifiedBy string `db:"modified_by"`
+	ModifiedAt int64  `db:"modified_at"`
+}
+
 type OrderPost struct {
-	ID       string  `json:"id"`
-	Price    float64 `json:"price" validate:"required"`
-	Username string  `json:"username" validate:"required"`
+	Price float64 `json:"price" validate:"required"`
 }
 
 type OrderPatch struct {

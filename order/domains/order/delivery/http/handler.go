@@ -24,10 +24,10 @@ func NewHandler(e *echo.Echo, us _order.Usecase) {
 		OrderUseCase: us,
 	}
 	
-	gu := e.Group("/user/account")
-	gu.GET("/healthcheck", handler.healthcheck)
-	gu.GET("/id/:id", handler.getOrderByID)
-	gu.GET("/username/:username", handler.getOrderByUsername)
+	gu := e.Group("/")
+	gu.GET("healthcheck", handler.healthcheck)
+	gu.GET("id/:id", handler.getOrderByID)
+	gu.GET("username/:username", handler.getOrderByUsername)
 	gu.POST("", handler.addOrder)
 }
 

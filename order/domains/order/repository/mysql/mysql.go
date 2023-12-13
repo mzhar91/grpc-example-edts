@@ -19,14 +19,14 @@ func NewMysqlRepository() _order.MysqlRepository {
 	return &mysqlRepository{}
 }
 
-func (m *mysqlRepository) Create(ctx context.Context, tx *_repository.Use, param *_models.Order) error {
+func (m *mysqlRepository) Create(ctx context.Context, tx *_repository.Use, param *_models.OrderCreate) error {
 	cols, values, err := _repository.Values(reflect.ValueOf(param).Elem())
 	if err != nil {
 		return err
 	}
 	
 	ib := sqlbuilder.MySQL.NewInsertBuilder()
-	ib.InsertInto("order")
+	ib.InsertInto("`order`")
 	ib.Cols(cols...)
 	ib.Values(values...)
 	
@@ -55,14 +55,14 @@ func (m *mysqlRepository) Create(ctx context.Context, tx *_repository.Use, param
 	return nil
 }
 
-func (m *mysqlRepository) Update(ctx context.Context, tx *_repository.Use, id uuid.UUID, param *_models.Order) error {
+func (m *mysqlRepository) UpdateStatus(ctx context.Context, tx *_repository.Use, id uuid.UUID, param *_models.OrderStatusUpdate) error {
 	set, err := _repository.Set(reflect.ValueOf(param).Elem())
 	if err != nil {
 		return err
 	}
 	
 	ub := sqlbuilder.MySQL.NewUpdateBuilder()
-	ub.Update("order")
+	ub.Update("`order`")
 	ub.Set(set...)
 	ub.Where(
 		ub.Equal("id", id),

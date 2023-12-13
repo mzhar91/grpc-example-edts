@@ -9,7 +9,6 @@ import (
 	"time"
 	
 	uuid "github.com/satori/go.uuid"
-	"gopkg.in/guregu/null.v3"
 	
 	_config "github.com/grpc-example-edts/payment/config"
 	_payment "github.com/grpc-example-edts/payment/domains/payment"
@@ -51,13 +50,13 @@ func (a *ucase) AddPayment(ctx context.Context, param _models.PaymentPost) (stri
 			id := uuid.NewV4()
 			
 			err := a.paymentRepo.Create(
-				ctx, conn, &_models.Payment{
+				ctx, conn, &_models.PaymentCreate{
 					ID:        id,
 					OrderID:   uuid.FromStringOrNil(param.OrderID),
 					Price:     param.Price,
 					Status:    "pending",
 					CreatedBy: "system",
-					CreatedAt: int(now.Unix()),
+					CreatedAt: now.Unix(),
 				},
 			)
 			if err != nil {
@@ -108,11 +107,11 @@ func (a *ucase) ConfirmPayment(ctx context.Context, id string, param _models.Pay
 				status = "cancel"
 			}
 			
-			err = a.paymentRepo.Update(
-				ctx, conn, uuid.FromStringOrNil(id), &_models.Payment{
+			err = a.paymentRepo.UpdateStatus(
+				ctx, conn, uuid.FromStringOrNil(id), &_models.PaymentStatusUpdate{
 					Status:     status,
-					ModifiedBy: null.StringFrom("system"),
-					ModifiedAt: null.IntFrom(now.Unix()),
+					ModifiedBy: "system",
+					ModifiedAt: now.Unix(),
 				},
 			)
 			if err != nil {

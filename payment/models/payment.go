@@ -11,9 +11,24 @@ type Payment struct {
 	Price      float64     `json:"price" db:"price"`
 	Status     string      `json:"status" db:"status"`
 	CreatedBy  string      `json:"createdBy" db:"created_by"`
-	CreatedAt  int         `json:"createdAt" db:"created_at"`
+	CreatedAt  int64       `json:"createdAt" db:"created_at"`
 	ModifiedBy null.String `json:"modifiedBy" db:"modified_by"`
 	ModifiedAt null.Int    `json:"modifiedAt" db:"modified_at"`
+}
+
+type PaymentCreate struct {
+	ID        uuid.UUID `db:"id"`
+	OrderID   uuid.UUID `db:"order_id"`
+	Price     float64   `db:"price"`
+	Status    string    `db:"status"`
+	CreatedBy string    `db:"created_by"`
+	CreatedAt int64     `db:"created_at"`
+}
+
+type PaymentStatusUpdate struct {
+	Status     string `db:"status"`
+	ModifiedBy string `db:"modified_by"`
+	ModifiedAt int64  `db:"modified_at"`
 }
 
 type PaymentPost struct {

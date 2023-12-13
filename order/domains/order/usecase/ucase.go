@@ -11,14 +11,16 @@ import (
 	"time"
 	
 	uuid "github.com/satori/go.uuid"
-	"gopkg.in/guregu/null.v3"
+	"google.golang.org/grpc"
 	
 	_config "github.com/grpc-example-edts/order/config"
 	_order "github.com/grpc-example-edts/order/domains/order"
 	_apiError "github.com/grpc-example-edts/order/helpers/apierror"
+	_grpcHelper "github.com/grpc-example-edts/order/helpers/grpc"
 	_repository "github.com/grpc-example-edts/order/helpers/repository"
 	_mysql "github.com/grpc-example-edts/order/helpers/repository/mysql"
 	_models "github.com/grpc-example-edts/order/models"
+	_paymentApiPB "github.com/grpc-example-edts/order/pb/client/payment-api"
 )
 
 type ucase struct {
@@ -53,13 +55,13 @@ func (a *ucase) AddOrder(ctx context.Context, param _models.OrderPost) (string, 
 			id := uuid.NewV4()
 			
 			err := a.orderRepo.Create(
-				ctx, conn, &_models.Order{
+				ctx, conn, &_models.OrderCreate{
 					ID:        id,
 					Username:  strconv.Itoa(rand.Intn(100)) + "@mail.com",
 					Price:     param.Price,
 					Status:    "inactive",
 					CreatedBy: "system",
-					CreatedAt: int(now.Unix()),
+					CreatedAt: now.Unix(),
 				},
 			)
 			if err != nil {
@@ -68,7 +70,28 @@ func (a *ucase) AddOrder(ctx context.Context, param _models.OrderPost) (string, 
 				return err, http.StatusInternalServerError
 			}
 			
-			result = id.String()
+			// calling grpc function for create payment
+			grpcPayment, ctxPayment, grpcConn := _grpcHelper.DialPaymentAPI(ctx)
+			defer func(grpcConn *grpc.ClientConn) {
+				err := grpcConn.Close()
+				if err != nil {
+					log.Printf(err.Error())
+				}
+			}(grpcConn)
+			
+			createPayment, err := grpcPayment.Payment.AddPayment(
+				ctxPayment, &_paymentApiPB.AddPaymentRequest{
+					OrderId: id.String(),
+					Price:   float32(param.Price),
+				},
+			)
+			if err != nil {
+				log.Printf(err.Error())
+				
+				return err, http.StatusInternalServerError
+			}
+			
+			result = id.String() + " | " + createPayment.Id
 			
 			return nil, http.StatusOK
 		},
@@ -102,11 +125,11 @@ func (a *ucase) EditOrder(ctx context.Context, id string, param _models.OrderPat
 				return err, http.StatusInternalServerError
 			}
 			
-			err = a.orderRepo.Update(
-				ctx, conn, uuid.FromStringOrNil(id), &_models.Order{
+			err = a.orderRepo.UpdateStatus(
+				ctx, conn, uuid.FromStringOrNil(id), &_models.OrderStatusUpdate{
 					Status:     param.Status,
-					ModifiedBy: null.StringFrom("system"),
-					ModifiedAt: null.IntFrom(now.Unix()),
+					ModifiedBy: "system",
+					ModifiedAt: now.Unix(),
 				},
 			)
 			if err != nil {
